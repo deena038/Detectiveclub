@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Detective Club: The Midnight Cookie Heist</title>
+<style>
+:root{--bg:#0d0a1f;--card:#241b4a;--ac:#ffcf40;--ok:#4cd98a;--bad:#ff5c85;--tx:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 50% 0,#3b2a7a,var(--bg) 60%) fixed;color:var(--tx);font-family:"Trebuchet MS",system-ui,sans-serif;max-width:560px;margin:auto;padding:14px;min-height:100vh;overflow-x:hidden}
+h1{font-size:24px;text-align:center;color:var(--ac);margin:4px 0;text-shadow:0 0 14px #ffcf4088}
+.bar{display:flex;justify-content:space-between;background:#00000055;border-radius:14px;padding:8px 14px;font-size:18px;margin-bottom:8px}
+.stage{text-align:center;font-size:80px;margin:6px 0;animation:float 3s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-8px)}}
+@keyframes shake{20%,60%{transform:translateX(-10px)}40%,80%{transform:translateX(10px)}}
+@keyframes pop{0%{transform:scale(.3);opacity:0}70%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+@keyframes flash{0%,100%{background:transparent}10%,30%{background:#fff}}
+.shake{animation:shake .5s}.pop{animation:pop .5s}
+#fl{position:fixed;inset:0;pointer-events:none;z-index:9}
+.story{background:var(--card);border-left:5px solid var(--ac);border-radius:14px;padding:14px;font-size:19px;line-height:1.5;margin:10px 0;min-height:90px}
+.talk{display:flex;gap:10px;align-items:flex-start;margin:8px 0;font-size:17px}.talk i{font-size:38px;font-style:normal}
+.talk div{background:#3a2f6b;border-radius:14px;padding:10px 12px}
+.clue{display:flex;gap:12px;align-items:center;width:100%;border:0;border-radius:16px;padding:14px;margin:7px 0;font-size:18px;color:#fff;background:linear-gradient(90deg,#4b2fa0,#7a3fc4);text-align:left;box-shadow:0 4px 0 #2a1a66}
+.clue.done{background:linear-gradient(90deg,#1c6b4b,#2fa070);box-shadow:0 4px 0 #0f3d2b}
+.clue.lock{opacity:.45;box-shadow:none}
+.clue span{font-size:34px}.clue small{display:block;font-size:13px;opacity:.85}
+.q{font-size:30px;text-align:center;margin:12px 0;letter-spacing:3px;font-weight:bold}
+input{width:100%;font-size:26px;padding:12px;border-radius:12px;border:3px solid var(--ac);text-align:center;background:#fff;color:#222}
+.b{width:100%;font-size:20px;padding:14px;border:0;border-radius:14px;background:var(--ac);color:#222;font-weight:bold;margin-top:8px;box-shadow:0 4px 0 #b88d00}
+.b:active{transform:translateY(3px);box-shadow:none}.b.s{background:#7a5cf0;color:#fff;box-shadow:0 4px 0 #46308f}
+.msg{text-align:center;font-size:20px;min-height:28px;margin-top:8px;font-weight:bold}
+.chase{height:16px;background:#00000066;border-radius:9px;position:relative;margin:10px 0}
+.chase div{height:100%;border-radius:9px;background:linear-gradient(90deg,#ffcf40,#ff5c85);transition:width .5s}
+.chase b{position:absolute;top:-14px;font-size:24px;transition:left .5s}
+.sus{display:flex;gap:8px}.sus button{flex:1;font-size:16px;padding:14px 4px;border:0;border-radius:16px;background:#3a2f6b;color:#fff;box-shadow:0 4px 0 #1f1650}
+.sus span{display:block;font-size:46px}
+.cards{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:8px 0}
+.cards div{width:46px;height:58px;border-radius:9px;background:#fff;color:#222;display:flex;align-items:center;justify-content:center;font-size:26px;border:3px solid var(--ac)}
+.cards div.e{background:#3a2f6b;border-style:dashed;opacity:.5;color:#fff}
+.shop{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}.shop button{font-size:28px;padding:8px 12px;border:2px solid var(--ac);border-radius:12px;background:#3a2f6b;color:#fff}.shop small{display:block;font-size:12px}
+.team{text-align:center;font-size:13px;opacity:.8;margin:6px 0}
+.big{font-size:26px;text-align:center;color:var(--ac)}
+.conf{position:fixed;top:-30px;font-size:26px;z-index:10;pointer-events:none;animation:fall 2.2s linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+</style></head><body>
+<div id="fl"></div>
+<h1>🔍 Detective Club</h1>
+<div id="app"></div>
+<script>
+const SUS=[["🦊","Fox"],["🐱","Cat"],["🦉","Owl"]];
+const CL0=[
+["m","👣","Muddy Footprints","They have tiny feather marks. No paws!","👣"],
+["s","👂","The Spooky Sound","A soft “Hoo… hoo…” came from the dark.","🔊"],
+["m","🌳","Crumb Trail","The crumbs go UP into a tall, tall tree!","🌳"],
+["s","📜","The Secret Note","“Meet me at midnight, under the moon.”","📜"],
+["m","🪟","The High Window","It is too high for any cat or fox to reach!","🪟"],
+["s","🪶","The Last Clue","A feather is stuck to the empty cookie box!","🪶"]];
+const W2=["family","necessary","neighbor","government","environment","adventure","tomorrow","knowledge","separate","calendar","treasure","dangerous","imagine","vacuum","exercise"],W3=["wednesday","especially","definitely","experience","embarrass","restaurant","disappear","mysterious","temperature","beginning","occasion","recommend","independent"];
+const WORDS=["because","friend","beautiful","different","favorite","strange","mystery","detective","thought","answer","believe","library","special","quickly","between","teacher","nearby","wonder","puzzle","secret","enough","through","laugh","heavy","island"];
+const SHOP=[["🎩",5],["🕶️",8],["🧥",12],["👑",20]];
+const CASES=[
+{n:"Level 1: The Midnight Cookie Heist",sus:SUS,thief:"Owl",cl:CL0,icon:"🌩️🍪",intro:"🌙 Midnight. Thunder booms! Baker Mia screams: “The GOLDEN MOON COOKIE is GONE!” Only YOU can find the thief before sunrise. Are you ready, detective?",rev:"Feathers. A hoot. A tall tree. A high window. All the clues point to ONE thief. Who stole the Golden Moon Cookie?",win:"The Owl takes off its mask. “I only wanted a midnight snack!” Baker Mia gives you the Golden Moon Cookie.",wi:"🦉🍪",hint:"feathers and “hoo”"},
+{n:"Level 2: The Vanishing Diamond Crown",sus:[["🦝","Raccoon"],["🐒","Monkey"],["🐻","Bear"]],thief:"Monkey",icon:"⚡👑",cl:[["m","🍌","Banana Peel","A banana peel is on the museum floor!","🍌"],["s","🙉","Strange Laugh","Guards heard “Ooh ooh ah ah!” in the hall.","🙉"],["m","🪢","Swinging Rope","The big rope is still swinging! Someone swung from it.","🪢"],["s","🖐️","Tiny Handprints","The glass has small hand prints with long fingers.","🖐️"],["m","🧶","Brown Fur","Brown fur is stuck on the window.","🧶"],["s","🔦","Dark Room","Someone broke the light. They like to climb in the dark.","🔦"],["m","📸","Camera Photo","A blurry photo shows a long curly tail!","📸"],["s","👑","Crown Case","The case is open. Only a quick, clever thief could do it!","👑"]],intro:"⚡ LEVEL 2! A big storm hits the Royal Museum. Lights go out. The Diamond Crown is GONE! The questions are harder now, and there are 8 clues. Ready?",rev:"A banana. Ooh ooh ah ah. A swinging rope. A long curly tail. Who stole the Diamond Crown?",win:"The Monkey drops down from the roof, laughing! “I just wanted to wear it!” The crown is safe.",wi:"🐒👑",hint:"bananas, swinging and a curly tail"},
+{n:"Level 3: The Ghost Ship Treasure",sus:[["🐙","Octopus"],["🦜","Parrot"],["🐊","Crocodile"]],thief:"Parrot",icon:"🌊🏴‍☠️",cl:[["m","🗺️","Torn Map","Half of the treasure map is gone!","🗺️"],["s","🗣️","Copied Voice","Someone copied the captain’s voice: “Open the door!”","🗣️"],["m","🪶","Colorful Feathers","Red and green feathers are on the deck.","🪶"],["s","🥜","Cracked Nuts","Nut shells are everywhere. Someone has a strong beak!","🥜"],["m","🔔","Ship Bell","The bell rang at midnight. Something light landed on it.","🔔"],["s","🌴","Small Footprints","Small three-toed prints go up the mast.","🌴"],["m","💎","Shiny Things","All the shiny coins are missing. Someone loves shiny things!","💎"],["s","🗝️","Open Lock","The lock was not broken. Someone who can talk opened it.","🗝️"],["m","🎙️","Strange Words","A voice keeps saying: “Pretty treasure! Squawk!”","🎙️"],["s","🏴‍☠️","Empty Chest","The chest is empty. Look up at the crow’s nest!","🏴‍☠️"]],intro:"🌊 FINAL LEVEL! A ghost ship floats in the fog. Captain Jack’s treasure has vanished! This is the hardest case, with 10 clues. Ready?",rev:"Colorful feathers. A copied voice. Cracked nuts. A thief who loves shiny things. Who took the treasure?",win:"The Parrot squawks: “Pretty treasure! Squawk!” You found the treasure. You are the GREATEST DETECTIVE!",wi:"🦜🏴‍☠️",hint:"feathers, talking and shiny things"}];
+const VIL=["Ha ha ha! Too slow, detective! 😈","You will NEVER catch me! 🌙","Wrong! Mmm, yummy cookie! 🍪","Is that your best try?! 😝"];
+const PIP=["Great job! You are so smart! 🌟","Wow! I knew you could do it! 🎉","Amazing detective work! 🔥","The mystery is getting closer! 🕵️"];
+let st={coins:0,done:{},hat:"🕵️",streak:0,chase:0,intro:0};
+try{Object.assign(st,JSON.parse(localStorage.getItem("dc2")||"{}"))}catch(e){}
+let shared={},cur=null,ref=null,me="me",AC=null;
+const $=id=>document.getElementById(id);
+const sv=()=>{try{localStorage.setItem("dc2",JSON.stringify(st))}catch(e){}};
+const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[R(0,a.length-1)];
+let LV=Math.min(st.lv||0,2),CL=CASES[LV].cl,DB=null,unsub=null;
+function setRef(){if(!DB)return;try{unsub&&unsub()}catch(e){}ref=DB.doc(LV?"cases/lv"+LV:"cases/moon2");unsub=ref.onSnapshot(s=>{shared=(s.exists&&s.data())||{};if(cur===null&&st.intro>LV)home()},()=>{})}
+const solved=i=>st.done[i]||shared[i];
+function snd(f,d=.15,t="square",v=.08){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(AC.destination);o.start();g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);o.stop(AC.currentTime+d)}catch(e){}}
+const win=()=>[523,659,784,1047].forEach((f,i)=>setTimeout(()=>snd(f,.2),i*110));
+const lose=()=>{snd(200,.3,"sawtooth");setTimeout(()=>snd(140,.4,"sawtooth"),180)};
+const dun=()=>[196,185,175].forEach((f,i)=>setTimeout(()=>snd(f,.7,"sawtooth",.12),i*500));
+function speak(w){try{const u=new SpeechSynthesisUtterance(w);u.lang="en-US";u.rate=.8;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
+function lightning(){const f=$("fl");f.style.animation="none";f.offsetWidth;f.style.animation="flash .7s";snd(80,.5,"sawtooth",.15)}
+function confetti(n=40){const e=["🎉","⭐","🪙","✨","🍪","🎊"];for(let i=0;i<n;i++){const s=document.createElement("div");s.className="conf";s.textContent=pick(e);s.style.left=R(0,95)+"vw";s.style.animationDelay=(Math.random()*.6)+"s";document.body.appendChild(s);setTimeout(()=>s.remove(),3200)}}
+function typeText(el,t,done){el.textContent="";let i=0;const iv=setInterval(()=>{el.textContent+=t[i++];if(i%3==0)snd(600+R(0,200),.03,"square",.03);if(i>=t.length){clearInterval(iv);done&&done()}},35)}
+function head(){const n=CL.filter((_,i)=>solved(i)).length;return `<div class="bar"><span>🪙 ${st.coins}</span><span>⭐ Lv ${LV+1}</span><span>🔥 ${st.streak}</span><span>🔎 ${n}/${CL.length}</span></div>`}
+function intro(){
+ $("app").innerHTML=`<div class="stage">${CASES[LV].icon}</div><div class="story" id="st"></div><button class="b" id="go" style="display:none">🕵️ Start the Case!</button>`;
+ lightning();
+ typeText($("st"),CASES[LV].intro,()=>{$("go").style.display="block";$("go").onclick=()=>{st.intro=LV+1;sv();snd(500);home()}});
+}
+function home(){
+ cur=null;
+ const n=CL.filter((_,i)=>solved(i)).length;
+ let h=head()+`<div class="big">${CASES[LV].n}</div><div class="stage">${st.hat}</div><div class="team" id="team"></div>`;
+ h+=`<div class="chase"><div style="width:${Math.min(st.chase*16,100)}%"></div><b style="left:${Math.min(st.chase*16,92)}%">🦹</b></div><div class="team">The thief is running! Wrong answers help the thief. 🏃</div>`;
+ h+=`<div class="cards">${CL.map((c,i)=>solved(i)?`<div class="pop">${c[4]}</div>`:`<div class="e">?</div>`).join("")}</div>`;
+ h+=CL.map((c,i)=>solved(i)?`<div class="clue done"><span>${c[1]}</span><div>${c[2]}<small>${c[3]}</small></div></div>`:`<button class="clue" onclick="scene(${i})"><span>${c[0]=="m"?"🔢":"🔤"}</span><div>${c[2]}<small>Tap to investigate!</small></div></button>`).join("");
+ if(n==CL.length)h+=`<div class="big pop">All clues found!</div><button class="b" onclick="reveal()">🎭 WHO DID IT?</button>`;
+ h+=`<div class="story" style="margin-top:14px"><b>👒 Detective shop</b><div class="shop">${SHOP.map((s,i)=>`<button onclick="buy(${i})">${s[0]}<small>🪙${s[1]}</small></button>`).join("")}</div></div>`;
+ $("app").innerHTML=h;
+ if(ref)team();
+}
+function team(){const k=new Set(Object.values(shared));const t=$("team");if(t)t.textContent=k.size>1?"👥 Team mode: "+k.size+" detectives!":"👥 Friends can join and help!"}
+function mk2(i){
+ if(CL[i][0]=="m"){
+  const t=R(0,6),h=LV==2;
+  if(t==0){const x=h?R(12,25):R(12,60),y=h?R(11,19):R(3,9);return[x+" × "+y,x*y]}
+  if(t==1){const x=R(1200,h?8999:4999),y=R(h?1100:600,h?3999:2900);return[x+" + "+y,x+y]}
+  if(t==2){const y=h?R(11,15):R(6,12),a=h?R(12,30):R(10,25);return[(y*a)+" ÷ "+y,a]}
+  if(t==3){const x=R(h?5000:1500,h?9900:4900),y=R(h?1200:500,h?4900:1400);return[x+" − "+y,x-y]}
+  if(t==4){const d=pick([2,3,4,5]),k=R(3,9)*d;return["What is 1/"+d+" of "+k+"?",k/d]}
+  if(t==5){const a=R(3,9),b=R(4,9),c=R(2,11);return["🐹 Pip has "+a+" bags with "+b+" cookies each. He eats "+c+". How many are left?",a*b-c]}
+  const w=R(5,20),l=R(6,25);return["A room is "+l+" m long and "+w+" m wide. What is the PERIMETER (all 4 sides)?",2*(l+w)]
+ }
+ const w=pick(LV==1?W2:W3);
+ if(R(0,2)==0){const p=R(1,w.length-4),k=LV==1?2:3;return[w.slice(0,p)+" "+"_ ".repeat(k)+w.slice(p+k),w,w]}
+ return["Unscramble: "+w.split("").sort(()=>Math.random()-.5).join(" ").toUpperCase(),w,w]
+}
+function mk(i){if(LV>0)return mk2(i);
+ if(CL[i][0]=="m"){
+  const t=R(0,5);
+  if(t==0){const x=R(3,12),y=R(3,12);return[x+" × "+y,x*y]}
+  if(t==1){const x=R(120,640),y=R(110,350);return[x+" + "+y,x+y]}
+  if(t==2){const y=R(3,9),a=R(4,12);return[(y*a)+" ÷ "+y,a]}
+  if(t==3){const x=R(400,950),y=R(110,390);return[x+" − "+y,x-y]}
+  if(t==4){const b=R(3,8),c=R(3,9);return["🐹 Pip has "+b+" bags. Each bag has "+c+" cookies. How many cookies?",b*c]}
+  const a=R(20,60),b=R(10,30);return["🍪 Mia baked "+a+" cookies and sold "+b+". How many are left?",a-b]
+ }
+ const w=pick(WORDS);
+ if(R(0,1)){const p=R(1,w.length-3);return[w.slice(0,p)+" _ _ "+w.slice(p+2),w,w]}
+ return["Unscramble: "+w.split("").sort(()=>Math.random()-.5).join(" ").toUpperCase(),w,w]
+}
+function scene(i){
+ const [q,a,say]=mk(i);cur={i,a:String(a)};
+ lightning();
+ const sp=say?`<button class="b s" onclick="speak('${say}')">🔊 Hear the word</button>`:"";
+ $("app").innerHTML=head()+`<div class="stage">${CL[i][1]}</div><div class="story"><b>${CL[i][2]}</b><br>${CL[i][3]}</div><div class="talk"><i>🦹</i><div>You cannot solve this one! Hee hee!</div></div><div class="q">${q}</div>${sp}<input id="in" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" ${say?"":'inputmode="numeric"'}><button class="b" onclick="check()">✔ Solve it!</button><button class="b s" onclick="home()">⬅ Back</button><div class="msg" id="m"></div>`;
+ if(say)speak(say);
+}
+async function check(){
+ const v=$("in").value.trim().toLowerCase(),m=$("m");
+ if(v===cur.a){
+  const i=cur.i;st.streak++;let g=3;if(st.streak%3==0)g+=5;st.coins+=g;st.done[i]=1;sv();win();confetti();
+  m.style.color="var(--ok)";m.className="msg pop";
+  m.innerHTML=`🐹 ${pick(PIP)}<br>+${g} coins ${g>3?"🔥 COMBO BONUS!":""}<br>New card: ${CL[i][4]}`;
+  try{if(ref){try{await ref.update({[i]:me})}catch(e){await ref.set({[i]:me})}}}catch(e){}
+  setTimeout(home,2800);
+ }else{
+  st.streak=0;st.chase++;sv();lose();
+  m.style.color="var(--bad)";m.className="msg shake";m.textContent="🦹 "+pick(VIL)+" Try again!";
+  $("app").classList.add("shake");setTimeout(()=>$("app").classList.remove("shake"),500);
+ }
+}
+function buy(i){const s=SHOP[i];if(st.coins<s[1]){snd(180,.3);alert("Not enough coins. Solve more clues!");return}st.coins-=s[1];st.hat=s[0]+"🕵️";sv();snd(900);home()}
+function reveal(){
+ $("app").innerHTML=head()+`<div class="stage">🎭</div><div class="story" id="st"></div><div id="ch"></div>`;
+ dun();typeText($("st"),CASES[LV].rev,()=>{
+  $("ch").innerHTML=`<div class="sus pop">${CASES[LV].sus.map(s=>`<button onclick="pickS('${s[1]}',this)"><span>${s[0]}</span>${s[1]}</button>`).join("")}</div><div class="msg" id="m"></div>`})
+}
+function pickS(n,b){
+ const m=$("m");
+ if(n==CASES[LV].thief){st.coins+=15+LV*5;sv();lightning();win();setTimeout(()=>confetti(80),300);
+  $("app").innerHTML=head()+`<div class="stage">${CASES[LV].wi}</div><div class="big pop">🏆 CASE SOLVED! 🏆</div><div class="story">${CASES[LV].win} +${15+LV*5} coins</div><button class="b" onclick="again()">${LV<2?"⬆️ Next Level: harder!":"🔄 Play from the start"}</button>`;
+ }else{b.classList.add("shake");lose();m.style.color="var(--bad)";m.textContent="🦹 Ha ha! Wrong! Think about ${CASES[LV].hint}! 🤔"}
+}
+function again(){const wrap=LV==2;if(wrap&&DB)[0,1,2].forEach(l=>DB.doc(l?"cases/lv"+l:"cases/moon2").set({}).catch(()=>{}));st.lv=wrap?0:LV+1;if(wrap)st.intro=0;LV=st.lv;CL=CASES[LV].cl;st.done={};st.chase=0;st.streak=0;sv();shared={};setRef();st.intro>LV?home():intro()}
+st.intro>LV?home():intro();
+(async()=>{try{
+ const u=await claude.use("user");if(u){try{me=(await u.id())||"me"}catch(e){}}
+ const d=await claude.use("db");if(d){DB=d;setRef()}
+}catch(e){}})();
+</script></body></html>
